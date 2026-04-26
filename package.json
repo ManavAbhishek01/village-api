@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "Production-grade REST API for India's complete village-level geographical data",
   "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
-    "build": "prisma generate"
-  },
+ "scripts": {
+  "start": "node server.js",
+  "dev": "node server.js",
+  "build": "prisma generate",
+  "vercel-build": "prisma generate"
+},
   "keywords": [
     "india",
     "villages",
