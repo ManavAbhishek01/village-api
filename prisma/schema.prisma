@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model State {
+  id        Int        @id @default(autoincrement())
+  code      Int        @unique
+  name      String
+  districts District[]
+  userAccess UserStateAccess[]
+  createdAt DateTime   @default(now())
+}
+
+model District {
+  id           Int           @id @default(autoincrement())
+  code         Int           @unique
+  name         String
+  stateId      Int
+  state        State         @relation(fields: [stateId], references: [id])
+  subDistricts SubDistrict[]
+  createdAt    DateTime      @default(now())
+}
+
+model SubDistrict {
+  id         Int       @id @default(autoincrement())
+  code       Int       @unique
+  name       String
+  districtId Int
+  district   District  @relation(fields: [districtId], references: [id])
+  villages   Village[]
+  createdAt  DateTime  @default(now())
+}
+
+model Village {
+  id            Int         @id @default(autoincrement())
+  code          Int
+  name          String
+  subDistrictId Int
+  subDistrict   SubDistrict @relation(fields: [subDistrictId], references: [id])
+  createdAt     DateTime    @default(now())
+
+  @@index([name])
+  @@index([subDistrictId])
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  businessName String
+  phone        String?
+  gstNumber    String?
+  passwordHash String
+  planType     PlanType  @default(FREE)
+  status       UserStatus @default(PENDING)
+  apiKeys      ApiKey[]
+  apiLogs      ApiLog[]
+  stateAccess  UserStateAccess[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model ApiKey {
+  id         Int       @id @default(autoincrement())
+  name       String
+  key        String    @unique
+  secretHash String
+  userId     Int
+  user       User      @relation(fields: [userId], references: [id])
+  status     KeyStatus @default(ACTIVE)
+  lastUsed   DateTime?
+  apiLogs    ApiLog[]
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime?
+}
+
+model ApiLog {
+  id           Int      @id @default(autoincrement())
+  apiKeyId     Int
+  apiKey       ApiKey   @relation(fields: [apiKeyId], references: [id])
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  endpoint     String
+  responseTime Int
+  statusCode   Int
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+}
+
+model UserStateAccess {
+  id      Int   @id @default(autoincrement())
+  userId  Int
+  stateId Int
+  user    User  @relation(fields: [userId], references: [id])
+  state   State @relation(fields: [stateId], references: [id])
+
+  @@unique([userId, stateId])
+}
+
+enum PlanType {
+  FREE
+  PREMIUM
+  PRO
+  UNLIMITED
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum KeyStatus {
+  ACTIVE
+  REVOKED
+}
