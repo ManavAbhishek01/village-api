@@ -1,13 +1,15 @@
 {
   "name": "village-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Production-grade REST API for India's complete village-level geographical data",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "prisma generate"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["india", "villages", "api", "address"],
+  "author": "Manav Abhishek",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
